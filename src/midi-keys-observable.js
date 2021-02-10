@@ -12,13 +12,14 @@ const midiKeysObservable = () => {
   const getInputs = (access) => Array.from(access.inputs.values());
   const listenToKeys = (input) => {
     input.onmidimessage = (e) => {
+      console.log("midi message", e.data);
       let d = e.data;
       let note = d[1];
       switch (d[0]) {
-        case 144:
+        case 158: //144 had worked
           state = [...state, note];
           break;
-        case 128:
+        case 142: //128 had worked
           state = state.filter((n) => n !== note);
           break;
         default:
