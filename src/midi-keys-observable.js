@@ -1,13 +1,8 @@
-import { interval, BehaviorSubject } from "rxjs";
-import { map } from "rxjs/operators";
+import { BehaviorSubject } from "rxjs";
 
 const midiKeysObservable = () => {
   let state = [];
-  const value = interval(500).pipe(map((val) => val * 3));
   let subject = new BehaviorSubject(state);
-  value.subscribe((v) => {
-    //subject.next([v]);
-  });
 
   const getInputs = (access) => Array.from(access.inputs.values());
   const listenToKeys = (input) => {
