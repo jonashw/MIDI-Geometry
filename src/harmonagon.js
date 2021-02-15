@@ -2,12 +2,19 @@ import Note from "@tonaljs/note";
 import { Transform } from "konva";
 import React from "react";
 import { Stage, Layer, Text, Circle, Group, Line } from "react-konva";
-export default ({ baseNote, notes, width, height, accidentals }) => {
+export default ({ interval, baseNote, notes, width, height, accidentals }) => {
   const r = Math.min(width, height) / 2 - 5;
   //const notes = ["B", "G", "Eb"];
   const fifths = Array(12)
     .fill(null)
-    .map((_, i) => Note.transposeFifths(baseNote, i))
+    .reduce(
+      (ns, _, i) => {
+        let prevNote = ns[ns.length - 1];
+        ns.push(Note.transpose(prevNote, interval));
+        return ns;
+      },
+      [baseNote]
+    )
     .map(Note.simplify)
     .map((f, i) => {
       let enharmonics = Array.from(new Set([f, Note.enharmonic(f)]));

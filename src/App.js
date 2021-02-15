@@ -6,11 +6,12 @@ import { midiToNoteName } from "@tonaljs/midi";
 import AbcNotation from "@tonaljs/abc-notation";
 import { Notation } from "react-abc";
 import Note from "@tonaljs/note";
+import React from "react";
+import Harmonagon from "./harmonagon";
 
-import CircleOfFifths from "./circle-of-fifths";
 export default function App() {
   const keys = useObservable(() => midiKeysObservable());
-
+  const [interval, setInterval] = React.useState("P5");
   const midiKeys = keys || [];
   const notes = midiKeys.map(midiToNoteName);
   const chords = detect(notes);
@@ -23,13 +24,31 @@ export default function App() {
   return (
     <div className="App">
       <div style={{ float: "right" }}>
-        <CircleOfFifths
+        <Harmonagon
+          interval={interval}
           baseNote={"C"}
           accidentals="b"
           notes={notes.map(Note.pitchClass)}
           width={window.innerWidth / 2}
           height={200}
         />
+        <div style={{ textAlign: "center", marginTop: "1em" }}>
+          {["m2", "P5"].map((n) => (
+            <label style={{ padding: "0.5em" }}>
+              <input
+                type="radio"
+                name="interval"
+                value={n}
+                checked={n === interval}
+                onChange={(e) => {
+                  setInterval(e.target.value);
+                  console.log(e.target.value);
+                }}
+              />
+              {n}
+            </label>
+          ))}
+        </div>
       </div>
       <div>Notes:</div>
       {json(notes.join(" "))}
