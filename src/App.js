@@ -25,6 +25,7 @@ export default function App() {
       <div style={{ float: "right" }}>
         <CircleOfFifths
           baseNote={"C"}
+          accidentals="b"
           notes={notes.map(Note.pitchClass)}
           width={window.innerWidth / 2}
           height={200}
