@@ -2,6 +2,8 @@ import Note from "@tonaljs/note";
 import { Transform } from "konva";
 import React from "react";
 import { Stage, Layer, Text, Circle, Group, Line } from "react-konva";
+import parseColor from "parse-color";
+
 export default ({ interval, baseNote, notes, width, height, accidentals }) => {
   const r = Math.min(width, height) / 2 - 5;
   //const notes = ["B", "G", "Eb"];
@@ -57,29 +59,35 @@ export default ({ interval, baseNote, notes, width, height, accidentals }) => {
       pairs: []
     }
   ).pairs;
-
+  console.log();
+  let points = coords.reduce((cs, c) => [...cs, c.x, c.y], []);
   return (
     <div>
       <Stage height={height} width={width}>
         <Layer>
           <Group x={width / 2} y={height / 2}>
-            {edges.map(([a, b]) => (
-              <Line
-                points={[a.x, a.y, b.x, b.y]}
-                stroke={"blue"}
-                strokeWidth={1}
-                lineJoin="round"
-              />
-            ))}
-          </Group>
+            <Circle
+              radius={r - 25}
+              key="the-Circle"
+              fill={parseColor("hsla(50,70,70,1)").hex}
+              strokeWidth={0}
+              stroke={"black"}
+            />
 
-          <Circle
-            radius={r - 25}
-            x={width / 2}
-            y={height / 2}
-            strokeWidth={1}
-            stroke={"black"}
-          />
+            <Line
+              key="FILL"
+              points={points}
+              tension={0.0}
+              closed
+              strokeWidth={3}
+              fill={parseColor("hsla(45,70,85,1)").hex}
+              /*stroke={"black"}
+              fillLinearGradientStartPoint={{ x: -50, y: -50 }}
+              fillLinearGradientEndPoint={{ x: 50, y: 50 }}
+              fillLinearGradientColorStops={[0, "red", 1, "yellow"]}
+              */
+            />
+          </Group>
 
           {fifths.map((f, i) => {
             var rotation = f.rotation;
@@ -91,8 +99,8 @@ export default ({ interval, baseNote, notes, width, height, accidentals }) => {
                 {playing && (
                   <Circle
                     stroke="blue"
-                    strokeWidth={1}
-                    fill="white"
+                    strokeWidth={0}
+                    fill={parseColor("hsla(00,70,70,1)").hex}
                     radius={6}
                     y={r - 25}
                   />
