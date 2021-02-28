@@ -4,7 +4,16 @@ import React from "react";
 import { Stage, Layer, Text, Circle, Group, Line } from "react-konva";
 import parseColor from "parse-color";
 
-export default ({ interval, baseNote, notes, width, height, accidentals }) => {
+export default ({
+  scale,
+  interval,
+  baseNote,
+  notes,
+  width,
+  height,
+  accidentals
+}) => {
+  scale = scale || 1;
   const r = Math.min(width, height) / 2 - 5;
   //const notes = ["B", "G", "Eb"];
   const fifths = Array(12)
@@ -30,6 +39,7 @@ export default ({ interval, baseNote, notes, width, height, accidentals }) => {
         rotation,
         p: t.point({ x: 0, y: r - 25 }),
         enharmonics,
+        playing: enharmonics.some((e) => notes.indexOf(e) > -1),
         chroma: Note.chroma(f),
         label:
           enharmonics.length === 1
@@ -60,18 +70,27 @@ export default ({ interval, baseNote, notes, width, height, accidentals }) => {
     }
   ).pairs;
   console.log();
+  let colorScheme = {
+    tertiary: parseColor("hsla(50,70,70,1)").hex,
+    primary: parseColor("hsla(00,70,70,1)").hex,
+    secondary: parseColor("hsla(45,70,85,1)").hex
+  };
   let points = coords.reduce((cs, c) => [...cs, c.x, c.y], []);
   return (
     <div>
-      <Stage height={height} width={width}>
+      <Stage
+        height={height}
+        width={width}
+        scale={((s) => ({ x: s, y: s }))(scale)}
+      >
         <Layer>
           <Group x={width / 2} y={height / 2}>
             <Circle
               radius={r - 25}
               key="the-Circle"
-              fill={parseColor("hsla(50,70,70,1)").hex}
-              strokeWidth={0}
-              stroke={"black"}
+              fill={colorScheme.secondary}
+              strokeWidth={12}
+              stroke={colorScheme.secondary}
             />
 
             <Line
@@ -79,52 +98,55 @@ export default ({ interval, baseNote, notes, width, height, accidentals }) => {
               points={points}
               tension={0.0}
               closed
-              strokeWidth={3}
-              fill={parseColor("hsla(45,70,85,1)").hex}
+              strokeWidth={2}
+              stroke={colorScheme.primary}
+              fill={"white"}
               /*stroke={"black"}
               fillLinearGradientStartPoint={{ x: -50, y: -50 }}
               fillLinearGradientEndPoint={{ x: 50, y: 50 }}
               fillLinearGradientColorStops={[0, "red", 1, "yellow"]}
               */
             />
-          </Group>
 
-          {fifths.map((f, i) => {
-            var rotation = f.rotation;
-            let w = 45;
-            let h = 20;
-            let playing = f.enharmonics.some((e) => notes.indexOf(e) > -1);
-            return (
-              <Group rotation={rotation} key={i} x={width / 2} y={height / 2}>
-                {playing && (
-                  <Circle
-                    stroke="blue"
-                    strokeWidth={0}
-                    fill={parseColor("hsla(00,70,70,1)").hex}
-                    radius={6}
-                    y={r - 25}
-                  />
-                )}
+            {fifths.map((f, i) => {
+              var rotation = f.rotation;
 
-                <Group x={0} y={r - 15}>
-                  <Text
-                    x={0}
-                    y={10}
-                    height={h}
-                    width={w}
-                    offsetX={w / 2}
-                    offsetY={h / 2}
-                    align="center"
-                    verticalAlign="middle"
-                    rotation={-rotation}
-                    fontSize={12}
-                    text={f.label}
-                    fill={"black"}
-                  />
+              let y = r / 1.33;
+              return (
+                <Group rotation={rotation} key={i}>
+                  <Group x={0} y={y}>
+                    <Circle
+                      fill={
+                        f.playing ? colorScheme.primary : colorScheme.secondary
+                      }
+                      radius={16}
+                    />
+                  </Group>
                 </Group>
-              </Group>
-            );
-          })}
+              );
+            })}
+
+            {fifths.map((f) => {
+              let w = 45;
+              let h = 20;
+              return (
+                <Text
+                  x={f.p.x}
+                  y={f.p.y}
+                  height={h}
+                  width={w}
+                  fontStyle={f.playing ? "bold" : ""}
+                  offsetX={w / 2}
+                  offsetY={h / 2}
+                  align="center"
+                  verticalAlign="middle"
+                  fontSize={12}
+                  text={f.label}
+                  fill={f.playing ? "white" : "black"}
+                />
+              );
+            })}
+          </Group>
         </Layer>
       </Stage>
       {/*
